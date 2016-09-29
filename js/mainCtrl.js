@@ -2,7 +2,7 @@ angular.module('itunes').controller('mainCtrl', function($scope, itunesService){
   //This is setting up the default behavior of our ng-grid. The important thing to note is
   //the 'data' property. The value is 'songData'. That means ng-grid is looking for songData on $scope and is putting whatever songData is into the grid.
   //this means when you make your iTunes request, you'll need to get back the information, parse it accordingly, then set it to songData on the scope -> $scope.songData = ...
-  $scope.gridOptions = { 
+  $scope.gridOptions = {
       data: 'songData',
       height: '110px',
       sortInfo: {fields: ['Song', 'Artist', 'Collection', 'Type'], directions: ['asc']},
@@ -26,8 +26,31 @@ angular.module('itunes').controller('mainCtrl', function($scope, itunesService){
   //Now write a function that will call the method on the itunesService that is responsible for getting the data from iTunes, whenever the user clicks the submit button
   //*remember, that method should be expecting an artist name. The artist name is coming from the input box on index.html, head over there and check if that input box is tied to any specific model we could use.
   //Also note that that method should be retuning a promise, so you could use .then in this function.
-    
-    //Code here
+
+    $scope.getSongData = function(artist) {
+      itunesService.getSongData(artist).then(function(response) {
+          var gridArray = [];
+          var resp = response.data.results
+          // console.log(response.data.results)
+          for (var i = 0; i < resp.length; i++) {
+            gridArray.push({
+              AlbumArt: resp[i].artworkUrl30,
+              Artist: resp[i].artistName,
+              SongName: resp[i].trackName,
+              Collection: resp[i].collectionName,
+              CollectionPrice: resp[i].collectionPrice,
+              Play: resp[i].previewUrl,
+              Type: resp[i].kind
+            });
+            // console.log(response.data.results.length);
+            // console.log(response.data.results[i])
+
+          };
+          $scope.songData = gridArray;
+          // console.log(gridArray);
+      })
+    }
+
 
 
   //Check that the above method is working by entering a name into the input field on your web app, and then console.log the result
@@ -46,15 +69,35 @@ angular.module('itunes').controller('mainCtrl', function($scope, itunesService){
       Type: "song"
   */
   //the iTunes API is going to give you a lot more details than ng-grid wants. Create a new array and then loop through the iTunes data pushing into your new array objects that look like the above data.
+    //
+    // $scope.gridFormat = function(dataArray) {
+    //   var gridArray = [];
+    //   for (var i = 0; i < dataArray.length; i++) {
+    //     if (dataArray.data.results[i] === 'AlbumArt') {
+    //       gridArray.push(dataArray.data.results[i]);
+    //     };
+    //     if (dataArray.data.results[i] === 'Artist') {
+    //       gridArray.push(dataArray.data.results[i]);
+    //     };
+    //     if (dataArray.data.results[i] === 'Collection') {
+    //       gridArray.push(dataArray.data.results[i]);
+    //     };
+    //     if (dataArray.data.results[i] === 'CollectionPrice') {
+    //       gridArray.push(dataArray.data.results[i]);
+    //     };
+    //     if (dataArray.data.results[i] === 'Play') {
+    //       gridArray.push(dataArray.data.results[i]);
+    //     };
+    //     if (dataArray.data.results[i] === 'Type') {
+    //       gridArray.push(dataArray.data.results[i]);
+    //     };
+    //   };
+    // }
 
-    //Code here
+    // $scope.gridOptions = $scope.gridFormat(response);
 
 
   //Once you have that final data array, you simply need to put it on the scope (or more specifically on the scope as songData). Once you do this ($scope.songData = myFinalArray) then ng-grid will see that and populate the page.
 
     //Code here
 });
-
-
-
-
